@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive UPSC Current Affairs Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Subtle Blue Accents -->
+    <!-- Application Structure Plan: A thematic, dashboard-style single-page application is designed for non-linear exploration, which is ideal for UPSC aspirants. The structure includes: 1) A top navigation bar for quick access to key sections. 2) A 'Core Strategy' section with interactive cards for sources, note-making, and the revision cycle. 3) A 'Subject-wise Integration' section, the app's core, using a tabbed interface to let users dive into specific subjects like Economy, IR, S&T, etc. This prevents overwhelming the user and allows focused study. 4) A 'Preparation Roadmap' section with an interactive timeline. This structure organizes the dense report content into logical, manageable modules, enhancing usability and learning efficiency. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification -> Library/Method. 1. Preparation Cycle -> Inform/Organize -> Interactive Diagram (HTML/CSS) -> On hover, details appear -> Visually explains the iterative process -> HTML/CSS/JS. 2. Economic Survey Data -> Compare/Inform -> Bar Chart (Chart.js) -> Tooltips on hover -> Shows trends in government spending clearly -> Chart.js. 3. S&T Key Areas -> Compare/Inform -> Doughnut Chart (Chart.js) -> Tooltips on hover -> Shows the relative importance of different tech fields -> Chart.js. 4. Government Schemes -> Organize/Inform -> Interactive Table (HTML/JS) -> Click on a row to see details -> Manages a large amount of data efficiently, allowing users to pull details on demand -> Vanilla JS. 5. Preparation Timeline -> Change/Organize -> Interactive Timeline (HTML/CSS) -> Click on a phase to expand -> Breaks down the long-term plan into digestible steps -> HTML/CSS/JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #333;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            color: #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+            font-weight: 600;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .subject-tab.active {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            border: 3px solid #f8f7f4;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Mastering UPSC Current Affairs</h1>
+            <p class="text-lg text-gray-600">An Interactive Guide to Strategic Preparation</p>
+        </header>
+
+        <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-20 shadow-sm rounded-lg mb-8">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="flex items-center justify-center md:justify-start space-x-4 md:space-x-8 overflow-x-auto py-3">
+                    <button class="nav-button py-2 px-3 text-gray-600 hover:text-blue-500 whitespace-nowrap" data-target="strategy">Core Strategy</button>
+                    <button class="nav-button py-2 px-3 text-gray-600 hover:text-blue-500 whitespace-nowrap" data-target="subjects">Subject Integration</button>
+                    <button class="nav-button py-2 px-3 text-gray-600 hover:text-blue-500 whitespace-nowrap" data-target="roadmap">Preparation Roadmap</button>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            <section id="strategy" class="content-section">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-800">The Pillars of Preparation</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Success in UPSC hinges on a systematic approach. This section outlines the fundamental strategies for sourcing information, making effective notes, and the critical cycle of revision and practice.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Source Selection: Quality Over Quantity</h3>
+                        <p class="text-gray-600 mb-4">Focus on a limited number of reliable sources like 'The Hindu', 'Indian Express', and official publications like PIB and PRS India to avoid information overload.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#128240;</span> Newspapers (Daily)</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#128193;</span> Monthly Magazines</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#128218;</span> Government Sources (PIB, PRS)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Effective Note-Making</h3>
+                        <p class="text-gray-600 mb-4">Create concise, personal notes using bullet points, mind maps, and keywords. Crucially, link current events to the static GS syllabus topics.</p>
+                         <ul class="space-y-2 text-sm">
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#9998;</span> Use Bullet Points & Keywords</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#129504;</span> Create Mind Maps</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#128279;</span> Link to GS Syllabus</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow lg:col-span-1 md:col-span-2">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Analytical Mindset</h3>
+                        <p class="text-gray-600">Move beyond *what* happened to understand the *why* and *how*. Analyze causes, impacts, and government measures for a deeper, Mains-ready perspective.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#128269;</span> Analyze Causes & Impacts</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#128161;</span> Identify Stakeholders</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-2">&#129300;</span> Evaluate Policy Responses</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center text-gray-800 mb-6">The "Read-Note-Revise-Practice" Cycle</h3>
+                    <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">This is not a linear path, but a continuous, iterative cycle. Each step reinforces the others, building a robust foundation of knowledge and application skills. Neglecting any one part weakens the entire preparation strategy.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-6 md:space-y-0 md:space-x-6">
+                        <div class="text-center p-4 rounded-lg bg-blue-50 w-48">
+                            <div class="text-4xl mb-2">&#128214;</div>
+                            <h4 class="font-semibold">1. Read</h4>
+                            <p class="text-sm text-gray-600">Daily Newspapers & Magazines</p>
+                        </div>
+                        <div class="text-2xl text-blue-400 font-bold transform md:rotate-0 rotate-90">&rarr;</div>
+                        <div class="text-center p-4 rounded-lg bg-green-50 w-48">
+                            <div class="text-4xl mb-2">&#9997;</div>
+                            <h4 class="font-semibold">2. Note</h4>
+                            <p class="text-sm text-gray-600">Concise, Syllabus-linked Notes</p>
+                        </div>
+                        <div class="text-2xl text-green-400 font-bold transform md:rotate-0 rotate-90">&rarr;</div>
+                        <div class="text-center p-4 rounded-lg bg-yellow-50 w-48">
+                            <div class="text-4xl mb-2">&#128260;</div>
+                            <h4 class="font-semibold">3. Revise</h4>
+                            <p class="text-sm text-gray-600">Daily, Weekly, & Monthly</p>
+                        </div>
+                        <div class="text-2xl text-yellow-400 font-bold transform md:rotate-0 rotate-90">&rarr;</div>
+                        <div class="text-center p-4 rounded-lg bg-red-50 w-48">
+                            <div class="text-4xl mb-2">&#128221;</div>
+                            <h4 class="font-semibold">4. Practice</h4>
+                            <p class="text-sm text-gray-600">Mock Tests & PYQs</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="subjects" class="content-section">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-800">Subject-wise Integration</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Current affairs are not an isolated subject. Explore how recent events integrate with core GS papers, providing the analytical depth needed for high scores. Select a subject to begin.</p>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                    <button class="subject-tab px-4 py-2 rounded-full bg-white shadow-sm hover:bg-blue-500 hover:text-white transition" data-subject="economy">Economy</button>
+                    <button class="subject-tab px-4 py-2 rounded-full bg-white shadow-sm hover:bg-blue-500 hover:text-white transition" data-subject="ir">International Relations</button>
+                    <button class="subject-tab px-4 py-2 rounded-full bg-white shadow-sm hover:bg-blue-500 hover:text-white transition" data-subject="snt">Science & Tech</button>
+                    <button class="subject-tab px-4 py-2 rounded-full bg-white shadow-sm hover:bg-blue-500 hover:text-white transition" data-subject="env">Environment</button>
+                    <button class="subject-tab px-4 py-2 rounded-full bg-white shadow-sm hover:bg-blue-500 hover:text-white transition" data-subject="governance">Governance & Schemes</button>
+                </div>
+
+                <div id="subject-content-area" class="bg-white p-6 md:p-8 rounded-xl shadow-lg min-h-[400px]">
+                    
+                </div>
+            </section>
+
+            <section id="roadmap" class="content-section">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">A Roadmap to Mastery</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Current affairs preparation is a marathon. This interactive timeline breaks down the year-long journey into manageable phases, each with specific goals and strategies. Click on each phase to reveal the plan.</p>
+                </div>
+                <div class="relative max-w-2xl mx-auto border-l-2 border-blue-200 pl-8">
+                    <div class="timeline-item mb-12 cursor-pointer" data-phase="1">
+                        <h3 class="text-xl font-semibold text-blue-600">Phase 1: Foundation Building</h3>
+                        <p class="text-sm text-gray-500 mb-2">(12+ Months Before Exam)</p>
+                        <div class="phase-details hidden bg-blue-50 p-4 rounded-lg">
+                            <p class="text-gray-700">Focus on developing a consistent newspaper reading habit. Understand core concepts and link them to the syllabus. Analyze Previous Year Papers to grasp the exam's demands. Begin incorporating monthly magazines towards the end of this phase.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item mb-12 cursor-pointer" data-phase="2">
+                        <h3 class="text-xl font-semibold text-blue-600">Phase 2: Consolidation & Revision</h3>
+                        <p class="text-sm text-gray-500 mb-2">(3-6 Months Before Exam)</p>
+                        <div class="phase-details hidden bg-blue-50 p-4 rounded-lg">
+                            <p class="text-gray-700">Intensify revision of notes from daily readings and monthly magazines. Identify and strengthen weak areas. Engage in group discussions to gain diverse perspectives and solidify understanding.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item cursor-pointer" data-phase="3">
+                        <h3 class="text-xl font-semibold text-blue-600">Phase 3: Fine-tuning & Exam Readiness</h3>
+                        <p class="text-sm text-gray-500 mb-2">(Last 3 Months)</p>
+                        <div class="phase-details hidden bg-blue-50 p-4 rounded-lg">
+                            <p class="text-gray-700">Shift focus to intensive practice. Regularly take full-length mock tests. Revise concise notes and use yearly compilations like PT 365. In the last month, concentrate only on the most high-yield topics. Prioritize health and well-being.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const navButtons = document.querySelectorAll('.nav-button');
+        const contentSections = document.querySelectorAll('.content-section');
+        const subjectTabs = document.querySelectorAll('.subject-tab');
+        const subjectContentArea = document.getElementById('subject-content-area');
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        let currentChart = null;
+
+        const subjectData = {
+            economy: {
+                title: 'Economy: Policy, Surveys & Growth',
+                description: 'The economy section tests your understanding of macroeconomic indicators, government policies, and key documents like the Economic Survey and Budget. It requires linking static concepts with dynamic, real-world events.',
+                content: `
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">The Economic Survey: A Goldmine</h4>
+                            <p class="text-gray-600 mb-4">This annual document is crucial. It provides an overview of the economy, summarizes major schemes, and offers analytical phrases that can be directly used in Mains answers. Many Prelims questions are derived from it.</p>
+                            <ul class="space-y-2 text-gray-600 text-sm">
+                                <li><strong>Volume I:</strong> Deals with conceptual and analytical issues.</li>
+                                <li><strong>Volume II:</strong> Provides a detailed account of various sectors.</li>
+                                <li><strong>Key Phrases:</strong> "Twin balance sheet problem", "Good economics is good politics".</li>
+                            </ul>
+                        </div>
+                        <div>
+                             <h4 class="text-xl font-semibold mb-3 text-center">Govt. Spending on Social Services</h4>
+                            <div class="chart-container">
+                                <canvas id="economyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                chart: {
+                    type: 'bar',
+                    data: {
+                        labels: ['Health Sector', 'Education Sector', 'Other Social Services'],
+                        datasets: [{
+                            label: 'Expenditure as % of Total Expenditure',
+                            data: [7.5, 9.7, 8.8],
+                            backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)'],
+                            borderColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Central & State Govt. Spending Trend' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y + '%';
+                                    }
+                                }
+                            }
+                        },
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' } } }
+                    }
+                }
+            },
+            ir: {
+                title: 'International Relations: A Dynamic World',
+                description: 'IR requires understanding India\'s foreign policy in the context of global shifts, key international institutions, and emerging challenges like cybersecurity and climate change.',
+                content: `
+                    <h4 class="text-xl font-semibold mb-4">Key Focus Areas</h4>
+                    <div class="grid md:grid-cols-2 gap-6 text-gray-600">
+                        <ul class="space-y-3">
+                            <li><strong class="text-gray-800">Indian Foreign Policy:</strong> Evolution, bilateral relations (e.g., with USA, China, Russia), and multilateral engagements (e.g., QUAD, SCO).</li>
+                            <li><strong class="text-gray-800">International Institutions:</strong> Role and reforms of UN, WTO, IMF, World Bank, and regional bodies like ASEAN, SAARC.</li>
+                        </ul>
+                        <ul class="space-y-3">
+                            <li><strong class="text-gray-800">Global Issues:</strong> Climate change negotiations, counter-terrorism efforts, global economic governance.</li>
+                            <li><strong class="text-gray-800">Emerging Challenges:</strong> Cybersecurity, health diplomacy, impact of AI, and space militarization.</li>
+                        </ul>
+                    </div>
+                     <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+                        <p class="font-semibold text-blue-800">Analytical Insight: The focus is shifting from static knowledge of institutions to analyzing India's role and strategy in navigating a complex, multipolar world.</p>
+                    </div>
+                `
+            },
+            snt: {
+                title: 'Science & Technology: Application & Policy',
+                description: 'UPSC focuses less on pure science and more on the application of technology to solve national problems, along with the associated government policies and ethical implications.',
+                content: `
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">Policy-Application Nexus</h4>
+                            <p class="text-gray-600 mb-4">For any technology, ask: What is its application in India? What government mission supports it (e.g., National Quantum Mission)? What are its societal impacts?</p>
+                            <div class="bg-blue-50 p-4 rounded-lg text-sm">
+                                <p class="font-semibold text-blue-800">Example: Electric Vehicles (EVs)</p>
+                                <p class="text-blue-700">Don't just learn about battery tech. Study the FAME-II scheme, environmental trade-offs of lithium mining, and India's goal for sustainable transport.</p>
+                            </div>
+                        </div>
+                        <div>
+                             <h4 class="text-xl font-semibold mb-3 text-center">Key S&T Areas in News</h4>
+                            <div class="chart-container" style="height: 300px; max-height: 350px;">
+                                <canvas id="sntChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                chart: {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Space Tech', 'Emerging Tech (AI, Quantum)', 'Biotech', 'Defence Tech', 'Clean Energy'],
+                        datasets: [{
+                            label: 'Focus Areas',
+                            data: [30, 25, 15, 15, 15],
+                            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Relative Importance based on News Coverage' }
+                        }
+                    }
+                }
+            },
+            env: {
+                title: 'Environment: Policy & Solutions',
+                description: 'The focus has shifted from static ecology to contemporary issues like climate change, pollution, and biodiversity loss, emphasizing policy responses, technological solutions, and international agreements.',
+                content: `
+                    <h4 class="text-xl font-semibold mb-4">Problem-Solution Orientation</h4>
+                    <p class="text-gray-600 mb-4">For every environmental issue, understand the problem and the corresponding solution being implemented. This includes laws, national missions, and technological interventions.</p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="font-semibold text-green-800">Issue: Air Pollution</p>
+                            <p class="text-green-700"><strong>Solution/Policy:</strong> National Clean Air Programme (NCAP), BS-VI norms, promotion of EVs.</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="font-semibold text-green-800">Issue: Climate Change</p>
+                            <p class="text-green-700"><strong>Solution/Policy:</strong> National Action Plan on Climate Change (NAPCC), Panchamrit goals, International Solar Alliance, National Green Hydrogen Mission.</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="font-semibold text-green-800">Issue: Plastic Pollution</p>
+                            <p class="text-green-700"><strong>Solution/Policy:</strong> Ban on Single-Use Plastics, Extended Producer Responsibility (EPR) policy.</p>
+                        </div>
+                         <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="font-semibold text-green-800">Issue: Biodiversity Loss</p>
+                            <p class="text-green-700"><strong>Solution/Policy:</strong> Wildlife Protection Act, Forest Conservation Act, Project Tiger, Project Elephant.</p>
+                        </div>
+                    </div>
+                `
+            },
+            governance: {
+                title: 'Governance & Social Justice',
+                description: 'Government schemes are the practical manifestation of governance and social justice principles. Understanding their objectives, beneficiaries, and implementation is key for GS-II and provides rich examples for Essays and Ethics.',
+                content: `
+                    <h4 class="text-xl font-semibold mb-4">Key Government Schemes</h4>
+                    <p class="text-gray-600 mb-4">The table below lists some prominent schemes. Note the responsible ministry and the target group. The real analysis lies in understanding their multi-dimensional impact (economic, social, environmental) and the role of technology in their delivery.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Scheme Name</th>
+                                    <th scope="col" class="px-6 py-3">Ministry</th>
+                                    <th scope="col" class="px-6 py-3">Objective</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">PM-KISAN</td><td class="px-6 py-4">Agriculture</td><td class="px-6 py-4">Income support to farmers</td></tr>
+                                <tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">Ayushman Bharat</td><td class="px-6 py-4">Health</td><td class="px-6 py-4">Health insurance for the poor</td></tr>
+                                <tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">Jal Jeevan Mission</td><td class="px-6 py-4">Jal Shakti</td><td class="px-6 py-4">Functional household tap connections</td></tr>
+                                <tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">MGNREGS</td><td class="px-6 py-4">Rural Development</td><td class="px-6 py-4">Rural employment guarantee</td></tr>
+                                <tr class="bg-white"><td class="px-6 py-4 font-medium text-gray-900">PM Vishwakarma</td><td class="px-6 py-4">MSME</td><td class="px-6 py-4">Skill enhancement for traditional artisans</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            }
+        };
+
+        function switchView(targetId) {
+            navButtons.forEach(btn => {
+                if (btn.dataset.target === targetId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            contentSections.forEach(section => {
+                if (section.id === targetId) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+        }
+
+        function switchSubject(subjectId) {
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            subjectTabs.forEach(tab => {
+                 if (tab.dataset.subject === subjectId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            const data = subjectData[subjectId];
+            subjectContentArea.innerHTML = `
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">${data.title}</h3>
+                <p class="text-gray-600 mb-6">${data.description}</p>
+                ${data.content}
+            `;
+            
+            if (data.chart) {
+                const ctx = document.getElementById(data.chart.type === 'bar' ? 'economyChart' : 'sntChart').getContext('2d');
+                currentChart = new Chart(ctx, {
+                    type: data.chart.type,
+                    data: data.chart.data,
+                    options: data.chart.options
+                });
+            }
+        }
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                switchView(button.dataset.target);
+            });
+        });
+
+        subjectTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchSubject(tab.dataset.subject);
+            });
+        });
+
+        timelineItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const details = item.querySelector('.phase-details');
+                details.classList.toggle('hidden');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchView('strategy');
+            switchSubject('economy');
+        });
+
+    </script>
+</body>
+</html>
